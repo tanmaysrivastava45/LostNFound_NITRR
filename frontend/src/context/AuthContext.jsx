@@ -29,15 +29,13 @@ export const AuthProvider = ({ children }) => {
   }, [])
 
   const signUp = async (email, password, fullName) => {
-    // Validate @nitrr.ac.in domain
-    // const validDomains = ['@nitrr.ac.in', '@it.nitrr.ac.in','@gmail.com']
-    // const isValidDomain = validDomains.some(domain => 
-    //   email.toLowerCase().endsWith(domain.toLowerCase())
-    // )
+    // REMOVED DOMAIN RESTRICTION - Accept any valid email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     
-    // if (!isValidDomain) {
-    //   throw new Error('Only @nitrr.ac.in and @it.nitrr.ac.in email addresses are allowed')
-    // }
+    if (!emailRegex.test(email)) {
+      throw new Error('Please enter a valid email address')
+    }
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -45,7 +43,7 @@ export const AuthProvider = ({ children }) => {
         data: {
           full_name: fullName
         },
-        emailRedirectTo: `${window.location.origin}/signin`
+        emailRedirectTo: `${window.location.origin}/auth/callback`
       }
     })
 
@@ -69,14 +67,13 @@ export const AuthProvider = ({ children }) => {
   }
 
   const resetPassword = async (email) => {
-  const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${window.location.origin}/reset-password`  // Changed from /signin
-  })
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`
+    })
 
-  if (error) throw error
-  return data
-}
-
+    if (error) throw error
+    return data
+  }
 
   const resendVerificationEmail = async () => {
     if (!user?.email) {
@@ -85,7 +82,10 @@ export const AuthProvider = ({ children }) => {
 
     const { error } = await supabase.auth.resend({
       type: 'signup',
-      email: user.email
+      email: user.email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`
+      }
     })
 
     if (error) throw error

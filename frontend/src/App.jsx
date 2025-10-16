@@ -4,11 +4,12 @@ import Landing from './pages/Landing'
 import SignUp from './pages/SignUp'
 import SignIn from './pages/SignIn'
 import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
+import AuthCallback from './pages/AuthCallback'  // MUST IMPORT THIS
 import Dashboard from './pages/Dashboard'
 import PostItem from './pages/PostItem'
 import FindItems from './pages/FindItems'
-import Navbar from './components/Navbar'
-import ResetPassword from './pages/ResetPassword'  
+import Navbar from './components/Navbar' 
 
 // Protected Route wrapper
 const ProtectedRoute = ({ children }) => {
@@ -51,6 +52,10 @@ function App() {
             <Route path="/signin" element={user ? <Navigate to="/dashboard" /> : <SignIn />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            
+            {/* CRITICAL: This route MUST exist */}
+            <Route path="/auth/callback" element={<AuthCallback />} />
+            
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard />
